@@ -178,9 +178,9 @@
 
 		const payload = {
 			lmid: medidor.LM_ID.toString(),
-			vactual: inputValue,
-			consumo: consumoCalculado,
-			claid
+			vactual: inputValue.toString(),
+			consumo: consumoCalculado.toString(),
+			claid: claid.toString() // Asegurar que sea string
 		};
 
 		console.group('📤 DEBUG: Guardando Lectura BT-1/BT-2');

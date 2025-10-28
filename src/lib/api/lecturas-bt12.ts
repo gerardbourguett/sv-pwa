@@ -16,7 +16,7 @@ export const lecturasBT12Api = {
 		});
 		console.log('JSON que se enviará:', JSON.stringify(data, null, 2));
 		console.groupEnd();
-		
+
 		await apiClient.put('/actualizar-lectura-bt-1-bt-2', data);
 	}
 };

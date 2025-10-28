@@ -40,49 +40,52 @@ export const load: PageLoad = async ({ params, fetch }) => {
 	try {
 		// Obtener token si estamos en el browser
 		const token = browser ? localStorage.getItem('token') : null;
-		
+
 		// Usar el fetch de SvelteKit para llamar a /lecturas-nicho
 		const searchParams = new URLSearchParams({ periodo, nicho });
 		const url = `${API_URL}/lecturas-nicho?${searchParams.toString()}`;
-		
+
 		console.group('🔍 DEBUG: Load Medidor +page.ts');
 		console.log('Params:', { medidorId, periodo, nicho });
 		console.log('URL:', url);
 		console.log('Medidor Parcial:', medidorParcial);
 		console.groupEnd();
-		
+
 		const headers: HeadersInit = {
 			'Content-Type': 'application/json'
 		};
-		
+
 		if (token) {
 			headers['Authorization'] = `Bearer ${token}`;
 		}
-		
+
 		const response = await fetch(url, { headers });
-		
+
 		console.log('📡 Response status:', response.status);
-		
+
 		if (!response.ok) {
 			console.error('❌ Response not OK:', response.status, response.statusText);
 			throw new Error(`HTTP error! status: ${response.status}`);
 		}
-		
+
 		const medidores: Medidor[] = await response.json();
 		console.log('📦 Medidores recibidos:', medidores.length);
 		console.log('🔍 Buscando LM_ID:', medidorId);
-		
+
 		// Buscar el medidor específico por LM_ID
 		const medidorCompleto = medidores.find((m) => m.LM_ID === medidorId);
-		
+
 		if (!medidorCompleto) {
 			console.error('❌ Medidor no encontrado en array');
-			console.log('IDs disponibles:', medidores.map(m => m.LM_ID));
+			console.log(
+				'IDs disponibles:',
+				medidores.map((m) => m.LM_ID)
+			);
 			throw error(404, 'No se pudo obtener la información completa del medidor.');
 		}
-		
+
 		console.log('✅ Medidor encontrado:', medidorCompleto);
-		
+
 		return { medidor: medidorCompleto };
 	} catch (err) {
 		console.error('❌ Error en load function:', err);
