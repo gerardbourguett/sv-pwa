@@ -56,7 +56,7 @@ function createClavesStore() {
 			if (!state || !state.claves || !Array.isArray(state.claves)) {
 				return [{ value: '0', label: 'Seleccione', idClave: '0' }];
 			}
-			
+
 			const clavesGrupo = state.claves.filter(
 				(clave) => clave.IdentificadorDeAgrupacion === groupId
 			);
@@ -75,7 +75,7 @@ function createClavesStore() {
 			if (!state || !state.claves || !Array.isArray(state.claves)) {
 				return '22'; // ID por defecto
 			}
-			
+
 			const claveCorrecta = state.claves.find((clave) =>
 				clave.DescripcionClave.includes('LEOK - LECTURA CORRECTA')
 			);
@@ -85,7 +85,7 @@ function createClavesStore() {
 			if (!state || !state.claves || !Array.isArray(state.claves)) {
 				return null;
 			}
-			
+
 			return (
 				state.claves.find((clave) =>
 					clave.DescripcionClave.toLowerCase().includes(descripcion.toLowerCase())
@@ -96,7 +96,7 @@ function createClavesStore() {
 			if (!state || !state.claves || !Array.isArray(state.claves)) {
 				return null;
 			}
-			
+
 			return state.claves.find((clave) => clave.IdClave === id) || null;
 		}
 	};
