@@ -31,6 +31,19 @@
 	let showMayorDialog = $state(false);
 	let showConsumoExcesivoDialog = $state(false);
 
+	// DEBUG: Log del medidor recibido
+	console.group('🔍 DEBUG: BT1BT2Form - Medidor Recibido');
+	console.log('Medidor completo:', medidor);
+	console.log('Campos críticos:', {
+		LM_ID: medidor.LM_ID,
+		ME_Digitos: medidor.ME_Digitos,
+		LM_ValorUltimaLectura: medidor.LM_ValorUltimaLectura,
+		ME_ConstanteMultiplicar: medidor.ME_ConstanteMultiplicar,
+		LM_ConsumoMesAnterior: medidor.LM_ConsumoMesAnterior,
+		ME_NSerie: medidor.ME_NSerie
+	});
+	console.groupEnd();
+
 	// Valores del medidor
 	const digito = medidor.ME_Digitos;
 	const valorAnterior = medidor.LM_ValorUltimaLectura;
@@ -151,6 +164,7 @@
 
 	async function guardarLectura() {
 		if (!isValidated) {
+			console.warn('❌ Lectura no validada');
 			return;
 		}
 
@@ -158,20 +172,39 @@
 			tipoLectura === 'mayor' ? clavesStore.getClaveCorrectaId(clavesState) : selectedClave;
 
 		if (claid === '0') {
+			console.warn('❌ Clave no seleccionada');
 			return;
 		}
 
+		const payload = {
+			lmid: medidor.LM_ID.toString(),
+			vactual: inputValue.toString(),
+			consumo: consumoCalculado.toString(),
+			claid: claid.toString() // Asegurar que sea string
+		};
+
+		console.group('📤 DEBUG: Guardando Lectura BT-1/BT-2');
+		console.log('Medidor completo:', medidor);
+		console.log('Payload a enviar:', payload);
+		console.log('Tipo de lectura:', tipoLectura);
+		console.log('Estado de claves:', clavesState);
+		console.log('Valores del formulario:', {
+			inputValue,
+			consumoCalculado,
+			valorAnterior,
+			digito,
+			constante
+		});
+		console.groupEnd();
+
 		try {
 			isSubmitting = true;
-			await lecturasBT12Api.actualizarLectura({
-				lmid: medidor.LM_ID.toString(),
-				vactual: inputValue,
-				consumo: consumoCalculado,
-				claid
-			});
+			await lecturasBT12Api.actualizarLectura(payload);
+			console.log('✅ Lectura guardada exitosamente');
 			goto('/');
 		} catch (error) {
-			console.error('Error al guardar lectura:', error);
+			console.error('❌ Error al guardar lectura:', error);
+			console.error('Detalles del error:', JSON.stringify(error, null, 2));
 		} finally {
 			isSubmitting = false;
 		}

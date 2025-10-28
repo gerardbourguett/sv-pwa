@@ -134,7 +134,7 @@
 				response.nichos.forEach((nicho: any) => {
 					nicho.filas.forEach((fila: any) => {
 						fila.medidores.forEach((medidor: any) => {
-							// Asegurarse de que el medidor tenga un ID consistente
+							// Asegurarse de que el medidor tenga un ID consistente y el campo nicho
 							const medidorConId = {
 								...medidor,
 								LM_ID: medidor.id || medidor.LM_ID,
@@ -144,6 +144,7 @@
 								LM_ConsumoMesAnterior:
 									medidor.consumoAnterior || medidor.LM_ConsumoMesAnterior || '0',
 								ME_NSerie: medidor.nSerie || medidor.ME_NSerie || '',
+								nicho: nicho.nombre, // Campo nicho para store inteligente
 								periodo: selectedPeriodo,
 								sector: selectedSector
 							};
@@ -152,7 +153,9 @@
 					});
 				});
 			}
+			// Guardar medidores y contexto
 			lecturasStore.setMedidores(todosMedidores, selectedPeriodo, selectedSector);
+			lecturasStore.setContextoBusqueda(selectedPeriodo, selectedSector);
 		} catch (err) {
 			console.error(err);
 			errorLecturas = err instanceof Error ? err.message : 'Error al cargar las lecturas';
