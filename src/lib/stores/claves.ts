@@ -32,8 +32,9 @@ function createClavesStore() {
 			update((state) => ({ ...state, isLoading: true, error: null }));
 
 			try {
-				const response = await apiClient.get<{ data: Clave[] }>('/Claves');
-				const claves = response.data;
+				const response = await apiClient.get<Clave[]>('/Claves');
+				// El endpoint probablemente retorna Clave[] directamente, no {data: Clave[]}
+				const claves = Array.isArray(response) ? response : [];
 
 				update((state) => ({
 					...state,
@@ -44,12 +45,18 @@ function createClavesStore() {
 				console.error('Error al cargar claves:', error);
 				update((state) => ({
 					...state,
+					claves: [], // Asegurar que sea un array vacío en caso de error
 					error: 'Error al cargar las claves de lectura',
 					isLoading: false
 				}));
 			}
 		},
 		getClavesForGroup(groupId: string, state: ClavesState): ClaveOption[] {
+			// Validación defensiva
+			if (!state || !state.claves || !Array.isArray(state.claves)) {
+				return [{ value: '0', label: 'Seleccione', idClave: '0' }];
+			}
+			
 			const clavesGrupo = state.claves.filter(
 				(clave) => clave.IdentificadorDeAgrupacion === groupId
 			);
@@ -64,12 +71,21 @@ function createClavesStore() {
 			];
 		},
 		getClaveCorrectaId(state: ClavesState): string {
+			// Validación defensiva
+			if (!state || !state.claves || !Array.isArray(state.claves)) {
+				return '22'; // ID por defecto
+			}
+			
 			const claveCorrecta = state.claves.find((clave) =>
 				clave.DescripcionClave.includes('LEOK - LECTURA CORRECTA')
 			);
 			return claveCorrecta ? claveCorrecta.IdClave : '22';
 		},
 		getClaveByDescripcion(descripcion: string, state: ClavesState): Clave | null {
+			if (!state || !state.claves || !Array.isArray(state.claves)) {
+				return null;
+			}
+			
 			return (
 				state.claves.find((clave) =>
 					clave.DescripcionClave.toLowerCase().includes(descripcion.toLowerCase())
@@ -77,6 +93,10 @@ function createClavesStore() {
 			);
 		},
 		getClaveById(id: string, state: ClavesState): Clave | null {
+			if (!state || !state.claves || !Array.isArray(state.claves)) {
+				return null;
+			}
+			
 			return state.claves.find((clave) => clave.IdClave === id) || null;
 		}
 	};
